@@ -6,10 +6,6 @@ import {generateToken,
      generateAccessToken,
      generateRefreshToken,
      verifyRefreshToken} from "../../common/utils/jwt.js";
-// import { refreshToken } from "./auth.controller.js";
-// import { string } from "joi";
-// import { errorMonitor } from "nodemailer/lib/xoauth2/index.js";
-
     
     const hashToken=(token)=>crypto.createHash("sha256").update(token).digest("hex");
         
@@ -22,6 +18,7 @@ import {generateToken,
         }
 
        const {rawToken, hashedToken}=generateToken();
+       
 
        const user= await User.create({
         name,
@@ -37,14 +34,11 @@ import {generateToken,
       }catch(err){
         console.log("failed to send email", err.message);
       }
-
-    console.log(user)
+    
     const userObj=user.toObject()
     delete userObj.password
     delete userObj.verificationToken
     delete userObj.verificationTokenExpires
-
-    console.log(userObj);
 
     return userObj
 
@@ -60,10 +54,6 @@ const verifyEmail = async (token)=>{
     const hashedInput = hashToken(trimmed);
 
     let user = await User.findOne({verificationToken : hashedInput, verificationTokenExpires : {$gt : Date.now()}}).select("+verificationToken +verificationTokenExpires");
-
-    // if(!user){
-    //   await User.findOne({verificationToken : trimmed}).select("+verificationToken");  
-    // } 
 
     if(!user){
         throw ApiError.unAuthorized("invalid or expire verification token")
@@ -124,7 +114,6 @@ const refresh =async(token)=>{
 
         return ({accessToken, refreshToken : newRefreshToken});
 
-        //user ko refresh token to bheja hi nahi ?
 
 };
 
@@ -146,7 +135,7 @@ const forgetPassword = async (email)=>{
    user.resetPasswordToken = hashedToken;
    user.resetPasswordExpires = Date.now() + 15 * 60 * 1000;
 
-   await user.save();
+   await user.save({validateBeforeSave:false});
 
    try{
     await sendResetPasswordEmail(email, rawToken);
@@ -168,7 +157,7 @@ const resetPassword = async (newPassword,token)=>{
     user.resetPasswordToken=undefined;
     user.resetPasswordExpires=undefined;
 
-    await user.save();
+    await user.save({validateBeforeSave : false});
 }
 
 const getMe = async (userId)=>{

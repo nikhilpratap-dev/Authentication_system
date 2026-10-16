@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
         maxlength : (50),
         required : [true, "password is required"],
         select : false
-        //kuch karna hai
+       
     },
 
     role : {
@@ -47,15 +47,6 @@ const userSchema = new mongoose.Schema({
     resetPasswordExpires:{type:Date,select:false},
 
 },{timestamps:true});
-
-// userSchema.set("toJSON", {
-//   transform: (doc, ret) => {
-//     delete ret.password;
-//     delete ret.refreshToken;
-//     delete ret.__v;
-//     return ret;
-//   }
-// });
 
 userSchema.pre("save", async function () {
     if(!this.isModified("password")) return;

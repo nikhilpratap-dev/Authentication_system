@@ -30,7 +30,7 @@ app.all("/{*path}", (req, res)=>{
 //
 
 app.use((err, req, res, next) => {
-  let statusCode = err.statuscode || 500;
+  let statusCode = err.statusCode || 500;
   let message = err.message;
 
   if (err.name === "TokenExpiredError") { statusCode = 401; message = "Token expired"; }
